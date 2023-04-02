@@ -1,1 +1,42 @@
+## ParkServiceMock.apxc
+@isTest
+global class ParkServiceMock implements WebServiceMock {
+    global void doInvoke(
+           Object stub,
+           Object request,
+           Map<String, Object> response,
+           String endpoint,
+           String soapAction,
+           String requestName,
+           String responseNS,
+           String responseName,
+           String responseType) {
+        ParkService.byCountryResponse response_x = new ParkService.byCountryResponse();
+        List<String> lstOfDummyParks = new List<String> {'Park1','Park2','Park3'};
+        response_x.return_x = lstOfDummyParks;
+        
+        response.put('response_x', response_x);
+    }
+}
 
+
+## ParkLocatorTest.apxc
+@isTest
+private class ParkLocatorTest{
+    @isTest 
+    static void testParkLocator() {
+        Test.setMock(WebServiceMock.class, new ParkServiceMock());
+        String[] arrayOfParks = ParkLocator.country('India');
+        
+        System.assertEquals('Park1', arrayOfParks[0]);
+    }
+}
+
+## ParkLocator.apxc
+public class ParkLocator {
+    public static String[] country(String country){
+        ParkService.ParksImplPort parks = new ParkService.ParksImplPort();
+        String[] parksname = parks.byCountry(country);
+        return parksname;
+    }
+}
