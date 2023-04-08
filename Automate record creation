@@ -1,0 +1,33 @@
+
+## MaintenanceRequestHelper.apxc
+
+public with sharing class MaintenanceRequestHelper {
+    public static void updateworkOrders(List<Case> updWorkOrders, Map<Id,Case> nonUpdCaseMap) {
+        Set<Id> validIds = new Set<Id>();
+        
+        
+        For (Case c : updWorkOrders){
+            if (nonUpdCaseMap.get(c.Id).Status != 'Closed' && c.Status == 'Closed'){
+                if (c.Type == 'Repair' || c.Type == 'Routine Maintenance'){
+                    validIds.add(c.Id);
+                    
+             
+                }
+            }
+        }
+        
+
+
+
+
+
+##  MaintenanceRequest.apxt
+trigger MaintenanceRequest on Case (before update, after update) {
+
+    if(Trigger.isUpdate && Trigger.isAfter){
+
+        MaintenanceRequestHelper.updateWorkOrders(Trigger.New, Trigger.OldMap);
+
+    }
+
+}
